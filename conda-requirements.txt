@@ -125,6 +125,5 @@ werkzeug=0.9.6=py27_1
 xlrd=0.9.3=py27_0
 xlsxwriter=0.5.7=py27_0
 xlwt=0.7.5=py27_0
-yaml=0.1.4=1
 zeromq=4.0.4=0
 zlib=1.2.8=0
