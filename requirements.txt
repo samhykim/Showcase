@@ -66,7 +66,6 @@ ply==3.4
 psutil==2.1.1
 py==1.4.25
 py4j==0.8.1
-PyAudio==0.2.7
 pycosat==0.6.1
 pycparser==2.10
 pycrypto==2.6.1
