@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing
 import os
+import json
 
 app = Flask(__name__)
 # Set up appropriate app settings 
@@ -44,6 +45,12 @@ def show_entries():
     cur = g.db.execute('select title, text from entries order by id desc')
     entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template('show_entries.html', entries=entries)
+
+@app.route('/start', methods=['POST'])
+def get_counts():
+    data = json.loads(request.data.decode())
+    url = data["url"]
+    print url
 
 
 @app.route('/add', methods=['POST'])
