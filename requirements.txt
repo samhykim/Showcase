@@ -39,7 +39,6 @@ greenlet==0.4.4
 grin==1.2.1
 gunicorn==19.2.1
 h5py==2.3.1
-ipython==2.2.0
 itsdangerous==0.24
 jdcal==1.0
 Jinja2==2.7.3
@@ -102,12 +101,3 @@ toolz==0.7.0
 tornado==4.0.2
 traits==4.4.0
 traitsui==4.4.0
-Twisted==14.0.2
-ujson==1.33
-unicodecsv==0.9.4
-w3lib==1.10.0
-Werkzeug==0.9.6
-xlrd==0.9.3
-XlsxWriter==0.5.7
-xlwt==0.7.5
-zope.interface==4.1.1
