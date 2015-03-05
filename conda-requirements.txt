@@ -90,7 +90,6 @@ pyparsing=2.0.1=py27_0
 pyqt=4.10.4=py27_0
 pytest=2.6.3=py27_0
 python=2.7.9=1
-python.app=1.2=py27_3
 pytz=2014.9=py27_0
 pyyaml=3.11=py27_0
 pyzmq=14.3.1=py27_0
