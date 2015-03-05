@@ -6,6 +6,9 @@ from contextlib import closing
 import os
 
 app = Flask(__name__)
+# Set up appropriate app settings 
+#app.config.from_object(os.environ['APP_SETTINGS'])
+#print(os.environ['APP_SETTINGS'])
 
 # configuration
 DATABASE = os.path.join(app.root_path, 'showcase.db')
