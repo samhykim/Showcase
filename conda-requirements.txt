@@ -36,7 +36,6 @@ docutils=0.12=py27_0
 dynd-python=0.6.5=np19py27_0
 enable=4.3.0=np19py27_2
 enaml=0.9.8=py27_0
-freetype=2.4.10=1
 future=0.13.1=py27_0
 futures=2.1.6=py27_0
 gevent=1.0.1=py27_0
