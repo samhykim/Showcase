@@ -78,7 +78,6 @@ pip=6.0.8=py27_0
 ply=3.4=py27_0
 psutil=2.1.1=py27_0
 py=1.4.25=py27_0
-pyaudio=0.2.7=py27_0
 pycosat=0.6.1=py27_0
 pycparser=2.10=py27_0
 pycrypto=2.6.1=py27_0
