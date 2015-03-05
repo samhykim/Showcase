@@ -54,7 +54,6 @@ libdynd=0.6.5=0
 libpng=1.5.13=1
 libsodium=0.4.5=0
 libtiff=4.0.2=1
-libxml2=2.9.0=1
 libxslt=1.1.28=2
 llvm=3.3=0
 llvmpy=0.12.7=py27_0
