@@ -172,9 +172,9 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
         else:
             team1 = DANCE_TEAMS[prev_team]
             team2 = DANCE_TEAMS[fixed_teams[index]]
-            conflicts = numConflicts(team1, team2)
-        if len(conflicts) <= MAX_CONFLICTS:
-            order = findOrder(index+1, teams, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - len(conflicts))
+            conflicts = len(numConflicts(team1, team2))
+        if conflicts <= MAX_CONFLICTS:
+            order = findOrder(index+1, teams, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - conflicts)
         else: 
             return False
         if order == False:
@@ -193,11 +193,11 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
         else:
             team1 = DANCE_TEAMS[prev_team]
             team2 = DANCE_TEAMS[team]
-            conflicts = numConflicts(team1, team2)
-            if len(conflicts) <= MAX_CONFLICTS:
+            conflicts = len(numConflicts(team1, team2))
+            if conflicts <= MAX_CONFLICTS:
                 teams_copy = teams[:]
                 teams_copy.remove(team)
-                order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - len(conflicts))
+                order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - conflicts)
                 if order == False:
                     continue
                 else:
