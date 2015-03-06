@@ -113,21 +113,37 @@ def upload():
         dance_teams[team] = [dancer.lower() for dancer in dancers]
 
     showcaseOrders = []
+    orders = []
     for i in range(6):
         order = findShowcaseOrder(fixed_teams, dance_teams, max_conflicts)
+        print 'order', order
         order_with_conflicts = []
-        if not order:
+        if not order or not isOrderUnique(order, orders):
             continue
         for i in range(len(order) - 1):
             curr_team = dance_teams[order[i]]
             next_team = dance_teams[order[i+1]]
             conflicts = list(numConflicts(curr_team, next_team))
             order_with_conflicts.append((order[i], conflicts))
+        order_with_conflicts.append((order[-1], []))
         showcaseOrders.append(order_with_conflicts)
-    print showcaseOrders
+        orders.append(order)
     if len(showcaseOrders) == 0:
          raise NoLineupFoundException()
     return jsonify(orders=showcaseOrders)
+
+def isOrderUnique(showcase_order, orders):
+    for order in orders:
+        if sameOrder(showcase_order, order):
+            return False
+    return True
+
+def sameOrder(order1, order2):
+    for i in range(len(order1)):
+        if order1[i] != order2[i]:
+            return False
+    return True
+
 
 def numConflicts(team1, team2):
     team11 = set(team1)
@@ -166,7 +182,6 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
     if len(teams) == 0:
         return []
     if index in fixed_teams:
-        print index
         if index == 0:
             conflicts = 0
         else:
@@ -179,7 +194,6 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
             return False
         if order == False:
             return False
-        print fixed_teams[index]
         return [fixed_teams[index]] + order
     for team in teams:
         if prev_team == None:
