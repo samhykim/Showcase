@@ -61,8 +61,9 @@ csvImport.directive('ngCsvImport', function ($http, $log, status) {
 					}).
 	    		success(function(results) {
 	      	$log.log(results);
-	      	status.success(results.length + " potential showcase lineups have been found."); 
 	      	scope.showcaseOrders = results['orders'];
+	      	status.success(scope.showcaseOrders.length + " potential showcase lineups have been found."); 
+	      	
 	    	}).
 	    		error(function(error) {
 	      	//$log.log(error);

@@ -78,7 +78,7 @@ class NoLineupFoundException(Exception):
     status_code = 400
     def __init__(self, details=None):
         Exception.__init__(self)
-        self.message = "No showcase lineups were found that satisfy the conditions." + 
+        self.message = "No showcase lineups were found that satisfy the conditions." + \
             " Please increase the maximum number of conflicts allowed."
         self.details = details
     
@@ -96,7 +96,7 @@ def upload():
     data = json.loads(request.data.decode())
     fixed_teams = data["fixed_teams"]
     dance_teams = data["result"]
-    max_conflicts = data["max_conflicts"]
+    max_conflicts = int(data["max_conflicts"])
     # form URL, id necessary
     
     #job = q.enqueue_call(
@@ -115,16 +115,25 @@ def upload():
     showcaseOrders = []
     for i in range(6):
         order = findShowcaseOrder(fixed_teams, dance_teams, max_conflicts)
-        if order:
-            showcaseOrders.append(order)
-    if len(showcaseOrders) == 6:
+        order_with_conflicts = []
+        if not order:
+            continue
+        for i in range(len(order) - 1):
+            curr_team = dance_teams[order[i]]
+            next_team = dance_teams[order[i+1]]
+            conflicts = list(numConflicts(curr_team, next_team))
+            order_with_conflicts.append((order[i], conflicts))
+        showcaseOrders.append(order_with_conflicts)
+    print showcaseOrders
+    if len(showcaseOrders) == 0:
          raise NoLineupFoundException()
     return jsonify(orders=showcaseOrders)
 
 def numConflicts(team1, team2):
     team11 = set(team1)
     team22 = set(team2)
-    return len(team11.intersection(team22))
+    conflicts = team11.intersection(team22)
+    return conflicts
 
 def reverseDict(dic):
     new_dict = {}
@@ -153,7 +162,7 @@ def findShowcaseOrder(fixed_teams, dance_teams, max_conflicts):
 
 
 
-def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0):
+def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
     if len(teams) == 0:
         return []
     if index in fixed_teams:
@@ -164,8 +173,8 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0
             team1 = DANCE_TEAMS[prev_team]
             team2 = DANCE_TEAMS[fixed_teams[index]]
             conflicts = numConflicts(team1, team2)
-        if conflicts <= MAX_CONFLICTS:
-            order = findOrder(index+1, teams, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
+        if len(conflicts) <= MAX_CONFLICTS:
+            order = findOrder(index+1, teams, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - len(conflicts))
         else: 
             return False
         if order == False:
@@ -185,10 +194,10 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0
             team1 = DANCE_TEAMS[prev_team]
             team2 = DANCE_TEAMS[team]
             conflicts = numConflicts(team1, team2)
-            if conflicts <= MAX_CONFLICTS:
+            if len(conflicts) <= MAX_CONFLICTS:
                 teams_copy = teams[:]
                 teams_copy.remove(team)
-                order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
+                order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - len(conflicts))
                 if order == False:
                     continue
                 else:
