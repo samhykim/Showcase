@@ -1,0 +1,41 @@
+<div>
+	<div class="row-fluid">
+		<div class="span4">
+			<div class="label">Top</div>
+				<input type="checkbox" ng-model="orientation">
+				<div ng-show="separator" ><div class="label">Separator</div>
+					<input type="text" ng-change="changeSeparator" ng-model="separator">
+				</div>
+				<div><div class="label">Enter max number of conflicts allowed</div>
+					<input type="text" ng-model="max_conflicts">
+				</div>
+			<div>
+				<input class="gray" type="file"/><button class="btn" ng-click="upload()">upload</button>
+			</div>
+			
+
+			<ul class="nav">
+				<li ng-repeat="team in teams">
+					<input type="text" ng-model="team" ng-change="updateOrder(team, $index)">
+				</li>
+			</ul>
+			{{teamOrder}}
+			<div ng-if="uploaded">
+				<form name="form" novalidate class="form-horizontal" ng-submit="findOrder()">
+			    <div class="control-group">
+			      <div class="controls">
+			        <button type="submit" ng-disabled="form.$invalid" class="btn">Find Order</button>
+			      </div>
+			    </div>
+			  </form>
+			</div>
+		</div>
+		<div class="span8">
+			<h3>Potential Showcase Lineups</h3>
+			<ul class="showcase-list" ng-repeat="order in showcaseOrders">
+				Order {{$index + 1}}
+				<li ng-repeat="team in order">{{team}}</li>
+			</ul>
+		</div>
+	</div>
+</div>

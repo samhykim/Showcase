@@ -1,12 +1,21 @@
 # all the imports
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+     abort, render_template, flash, jsonify
 from contextlib import closing
 import os
 import json
+from rq import Queue
+from rq.job import Job
+from worker import conn
+import random
+import ast
+from codecs import encode
+import collections
+
 
 app = Flask(__name__)
+q = Queue(connection=conn)
 # Set up appropriate app settings 
 #app.config.from_object(os.environ['APP_SETTINGS'])
 #print(os.environ['APP_SETTINGS'])
@@ -39,31 +48,120 @@ def teardown_request(exception):
     if db is not None:
         db.close()
 
-@app.route('/')
+@app.route('/',  methods=['GET', 'POST'])
 def show_entries():
     #db = get_db()
-    cur = g.db.execute('select title, text from entries order by id desc')
-    entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
-    return render_template('show_entries.html', entries=entries)
+    #cur = g.db.execute('select title, text from entries order by id desc')
+    #entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
+    #return render_template('show_entries.html', entries=entries)
+    return render_template('index.html')
+
+def count_and_save_words(url):
+    print url
+    print 'count and save words'
 
 @app.route('/start', methods=['POST'])
 def get_counts():
     data = json.loads(request.data.decode())
     url = data["url"]
-    print url
+    # form URL, id necessary
+    if 'http://' not in url[:7]:
+        url = 'http://' + url
+    # start job
+    job = q.enqueue_call(
+        func=count_and_save_words, args=(url,), result_ttl=5000
+    )
+    # return created job id
+    return job.get_id()
+
+#@app.route("/upload", methods=['GET', 'POST'])
+#def upload():
+#    return render_template("upload_csv.html")
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    data = json.loads(request.data.decode())
+    fixed_teams = data["fixed_teams"]
+    dance_teams = data["result"]
+    max_conflicts = data["max_conflicts"]
+    # form URL, id necessary
+    
+    #job = q.enqueue_call(
+    #    func=count_and_save_words, args=(dance_teams,), result_ttl=5000
+    #)
+    # return created job id
+    fixed_teams = convertToDict(fixed_teams)
+    dance_teams = convertToDict(dance_teams)
+
+    showcaseOrders = []
+    for i in range(6):
+        order = findShowcaseOrder(fixed_teams, dance_teams, max_conflicts)
+        showcaseOrders.append(order)
+    return jsonify(orders=showcaseOrders)
+
+def numConflicts(team1, team2):
+    team11 = set(team1)
+    team22 = set(team2)
+    return len(team11.intersection(team22))
+
+def reverseDict(dic):
+    new_dict = {}
+    for key,values in dic.items():
+        new_dict[values] = key.lower()
+    return new_dict
+
+def convertToDict(data): # currently dictionary contains unicode characters
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convertToDict, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convertToDict, data))
+    else:
+        return data
+
+def findShowcaseOrder(fixed_teams, dance_teams, max_conflicts):
+    teams = dance_teams['teams']
+    teams = teams[:]
+    random.shuffle(teams)
+    for team in fixed_teams:
+        teams.remove(team)
+    fixed_teams = reverseDict(fixed_teams)
+    DANCE_TEAMS = dance_teams
+    return findOrder(0, teams, None, fixed_teams, DANCE_TEAMS, max_conflicts)
 
 
-@app.route('/add', methods=['POST'])
-def add_entry():
-    if not session.get('logged_in'):
-        abort(401)
-    #db = get_db()
-    g.db.execute('insert into entries (title, text) values (?, ?)',
-               [request.form['title'], request.form['text']])
-    g.db.commit()
-    flash('New entry was successfully posted')
-    return redirect(url_for('show_entries'))
 
+def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0):
+    if len(teams) == 0:
+        return []
+    if index in fixed_teams:
+        if index == 0:
+            conflicts = 0
+        else:
+            team1 = DANCE_TEAMS[prev_team]
+            team2 = DANCE_TEAMS[fixed_teams[index]]
+            conflicts = numConflicts(team1, team2)
+        if conflicts <= MAX_CONFLICTS:
+            order = findOrder(index+1, teams, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
+        else: 
+            return False
+        if order == False:
+            return False
+        return [fixed_teams[index]] + order
+    for team in teams:
+        team1 = DANCE_TEAMS[prev_team]
+        team2 = DANCE_TEAMS[team]
+        conflicts = numConflicts(team1, team2)
+        if conflicts <= MAX_CONFLICTS:
+            teams.remove(team)
+            order = findOrder(index+1, teams, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
+            if order == False:
+                continue
+            else:
+                return [team] + order
+    return False
+    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
