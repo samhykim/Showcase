@@ -34,7 +34,7 @@
 			<h3>Potential Showcase Lineups</h3>
 			<ze-status class="general-alert"></ze-status>
 			<ul class="showcase-list" ng-repeat="order in showcaseOrders">
-				Order {{$index + 1}}
+				<h4>Order {{$index + 1}}</h4>
 				<li ng-repeat="team in order" ng-init="dancers=team[1]">
 					{{team[0]}}
 					<ul><li ng-repeat="dancer in dancers"><span style="color:red">{{dancer}}</span></li></ul>
