@@ -1,0 +1,18 @@
+<div class="status-wrapper" ng-show="(status.alert.message || status.alert.type)">
+    <div class="alert" ng-class="status.alert.class">
+        <button ng-hide="status.alert.spinner" type="button" class="close" ng-click="status.clear()">&times;</button>
+
+        <span ng-switch="status.alert.type">
+
+            <span ng-switch-default>
+                {{status.alert.message}}
+            </span>
+
+        </span>
+
+        <i ng-show="status.alert.spinner" class="icon-spinner icon-spin"></i>
+
+    </div>
+</div>
+
+

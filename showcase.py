@@ -74,9 +74,22 @@ def get_counts():
     # return created job id
     return job.get_id()
 
-#@app.route("/upload", methods=['GET', 'POST'])
-#def upload():
-#    return render_template("upload_csv.html")
+class NoLineupFoundException(Exception):
+    status_code = 400
+    def __init__(self, details=None):
+        Exception.__init__(self)
+        self.message = "No showcase lineups were found that satisfy the conditions." + 
+            " Please increase the maximum number of conflicts allowed."
+        self.details = details
+    
+@app.errorhandler(NoLineupFoundException)
+def bad_request_handler(error):
+    return bad_request(error.message)
+
+def bad_request(message):
+    response = jsonify({'message': message})
+    response.status_code = 404
+    return response
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -102,7 +115,10 @@ def upload():
     showcaseOrders = []
     for i in range(6):
         order = findShowcaseOrder(fixed_teams, dance_teams, max_conflicts)
-        showcaseOrders.append(order)
+        if order:
+            showcaseOrders.append(order)
+    if len(showcaseOrders) == 6:
+         raise NoLineupFoundException()
     return jsonify(orders=showcaseOrders)
 
 def numConflicts(team1, team2):
@@ -138,8 +154,6 @@ def findShowcaseOrder(fixed_teams, dance_teams, max_conflicts):
 
 
 def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0):
-    print index
-    print fixed_teams
     if len(teams) == 0:
         return []
     if index in fixed_teams:

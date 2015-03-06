@@ -16,7 +16,7 @@
 
 			<ul class="nav">
 				<li ng-repeat="team in teams">
-					<input type="text" ng-model="team" ng-change="updateOrder(team, $index)">
+					{{$index+1}}<input style="margin-top:8px; margin-left:10px" type="text" ng-model="team" ng-change="updateOrder(team, $index)">
 				</li>
 			</ul>
 			{{teamOrder}}
@@ -32,6 +32,7 @@
 		</div>
 		<div class="span8">
 			<h3>Potential Showcase Lineups</h3>
+			<ze-status class="general-alert"></ze-status>
 			<ul class="showcase-list" ng-repeat="order in showcaseOrders">
 				Order {{$index + 1}}
 				<li ng-repeat="team in order">{{team}}</li>

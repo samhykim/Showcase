@@ -4,7 +4,7 @@
 
 var csvImport = angular.module('ngCsvImport', ['ngRoute']);
 
-csvImport.directive('ngCsvImport', function ($http, $log) {
+csvImport.directive('ngCsvImport', function ($http, $log, status) {
 	return {
 		restrict: 'E',
 		transclude: true,
@@ -61,11 +61,14 @@ csvImport.directive('ngCsvImport', function ($http, $log) {
 					}).
 	    		success(function(results) {
 	      	$log.log(results);
+	      	status.success(results.length + " potential showcase lineups have been found."); 
 	      	scope.showcaseOrders = results['orders'];
 	    	}).
 	    		error(function(error) {
-	      	$log.log(error);
-	  });
+	      	//$log.log(error);
+	      	console.log(error)
+	      	status.error(error.message);
+	  		});
 			}
 			element.on('change', function(onChangeEvent) {
 				var reader = new FileReader();

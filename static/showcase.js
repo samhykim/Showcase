@@ -5,7 +5,6 @@
 angular.module('showcase', ['ngRoute', 'angularFileUpload', 'ngCsvImport'])
 
 .controller('ShowcaseController', function ($scope, $http, $log, FileUploader) {
-  console.log('sam')
   //$scope.data = {'sam', 'sdf'}
   //$scope.sam = 'sadf'
   $scope.uploader = new FileUploader();
