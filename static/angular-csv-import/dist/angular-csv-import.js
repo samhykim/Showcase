@@ -120,14 +120,24 @@ csvImport.directive('ngCsvImport', function ($http, $log, status) {
 					for (var i=1; i < lines.length; i++) {
 						var currentline=lines[i].split(new RegExp(content.separator+'(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)'));
 						for (var k=0; k < currentline.length; k++) {
-							result[teams[k]].push(currentline[k]);
+							if (currentline[k] != '') {
+								result[teams[k]].push(currentline[k]);
+							}
 						}
 					}
 				} else {
 					for (var i=0; i < lines.length; i++) {
 						var currentline=lines[i].split(new RegExp(content.separator+'(?![^"]*"(?:(?:[^"]*"){2})*[^"]*$)'));
+						console.log(currentline)
+						var updateline = []
 						var team = currentline.shift();
-						result[team] = currentline;
+						for (var j=0; j < currentline.length; j++) {
+							if (currentline[j] != '') {
+								updateline.push(currentline[j]);
+							}
+						}
+						console.log(updateline)
+						result[team] = updateline;
 						teams.push(team);
 					}
 				}

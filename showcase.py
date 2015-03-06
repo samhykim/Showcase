@@ -97,6 +97,7 @@ def upload():
     fixed_teams = data["fixed_teams"]
     dance_teams = data["result"]
     max_conflicts = int(data["max_conflicts"])
+    print dance_teams
     # form URL, id necessary
     
     #job = q.enqueue_call(
