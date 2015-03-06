@@ -97,7 +97,6 @@ def upload():
     fixed_teams = data["fixed_teams"]
     dance_teams = data["result"]
     max_conflicts = int(data["max_conflicts"])
-    print dance_teams
     # form URL, id necessary
     
     #job = q.enqueue_call(
@@ -106,12 +105,17 @@ def upload():
     # return created job id
     fixed = convertToDict(fixed_teams)
     dance_teams = convertToDict(dance_teams)
+    print dance_teams
     fixed_teams = {}
     for key, value in fixed.items():
         fixed_teams[int(key)] = value
+    print fixed_teams
 
     for team, dancers in dance_teams.items():
-        dance_teams[team] = [dancer.lower() for dancer in dancers]
+        if team != "teams":
+            dance_teams[team] = [dancer.lower() for dancer in dancers]
+        else:
+            dance_teams[team] = [dancer for dancer in dancers]
 
     showcaseOrders = []
     orders = []
@@ -151,12 +155,6 @@ def numConflicts(team1, team2):
     team22 = set(team2)
     conflicts = team11.intersection(team22)
     return conflicts
-
-def reverseDict(dic):
-    new_dict = {}
-    for key,values in dic.items():
-        new_dict[values] = key.lower()
-    return new_dict
 
 def convertToDict(data): # currently dictionary contains unicode characters
     if isinstance(data, basestring):
