@@ -90,8 +90,14 @@ def upload():
     #    func=count_and_save_words, args=(dance_teams,), result_ttl=5000
     #)
     # return created job id
-    fixed_teams = convertToDict(fixed_teams)
+    fixed = convertToDict(fixed_teams)
     dance_teams = convertToDict(dance_teams)
+    fixed_teams = {}
+    for key, value in fixed.items():
+        fixed_teams[int(key)] = value
+
+    for team, dancers in dance_teams.items():
+        dance_teams[team] = [dancer.lower() for dancer in dancers]
 
     showcaseOrders = []
     for i in range(6):
@@ -124,18 +130,20 @@ def findShowcaseOrder(fixed_teams, dance_teams, max_conflicts):
     teams = dance_teams['teams']
     teams = teams[:]
     random.shuffle(teams)
-    for team in fixed_teams:
+    for index, team in fixed_teams.items():
         teams.remove(team)
-    fixed_teams = reverseDict(fixed_teams)
     DANCE_TEAMS = dance_teams
     return findOrder(0, teams, None, fixed_teams, DANCE_TEAMS, max_conflicts)
 
 
 
 def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0):
+    print index
+    print fixed_teams
     if len(teams) == 0:
         return []
     if index in fixed_teams:
+        print index
         if index == 0:
             conflicts = 0
         else:
@@ -148,18 +156,29 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS=0
             return False
         if order == False:
             return False
+        print fixed_teams[index]
         return [fixed_teams[index]] + order
     for team in teams:
-        team1 = DANCE_TEAMS[prev_team]
-        team2 = DANCE_TEAMS[team]
-        conflicts = numConflicts(team1, team2)
-        if conflicts <= MAX_CONFLICTS:
-            teams.remove(team)
-            order = findOrder(index+1, teams, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
+        if prev_team == None:
+            teams_copy = teams[:]
+            teams_copy.remove(team)
+            order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
             if order == False:
                 continue
             else:
                 return [team] + order
+        else:
+            team1 = DANCE_TEAMS[prev_team]
+            team2 = DANCE_TEAMS[team]
+            conflicts = numConflicts(team1, team2)
+            if conflicts <= MAX_CONFLICTS:
+                teams_copy = teams[:]
+                teams_copy.remove(team)
+                order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
+                if order == False:
+                    continue
+                else:
+                    return [team] + order
     return False
     
 

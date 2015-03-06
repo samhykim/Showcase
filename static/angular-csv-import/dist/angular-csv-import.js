@@ -42,8 +42,15 @@ csvImport.directive('ngCsvImport', function ($http, $log) {
 
 			scope.updateOrder = function (team, index) {
 				if (scope.teams.indexOf(team) > -1) {
-					scope.teamOrder[team] = index;
-				};
+					for (var i in scope.teamOrder) {
+						if (scope.teamOrder[i] == team) {
+							delete scope.teamOrder[i];
+						}
+					}
+					scope.teamOrder[index] = team;
+				} else if (team == '') {
+					delete scope.teamOrder[index];
+				}
 			};
 
 			scope.findOrder = function () {
