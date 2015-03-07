@@ -170,8 +170,8 @@ def findShowcaseOrder(fixed_teams, dance_teams, max_conflicts):
     teams = dance_teams['teams']
     teams = teams[:]
     random.shuffle(teams)
-    for index, team in fixed_teams.items():
-        teams.remove(team)
+    #for index, team in fixed_teams.items():
+    #    teams.remove(team)
     DANCE_TEAMS = dance_teams
     return findOrder(0, teams, None, fixed_teams, DANCE_TEAMS, max_conflicts)
 
@@ -188,14 +188,16 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
             team2 = DANCE_TEAMS[fixed_teams[index]]
             conflicts = len(numConflicts(team1, team2))
         if conflicts <= MAX_CONFLICTS:
-            order = findOrder(index+1, teams, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - conflicts)
+            teams_copy = teams[:]
+            teams_copy.remove(fixed_teams[index])
+            order = findOrder(index+1, teams_copy, fixed_teams[index], fixed_teams, DANCE_TEAMS, MAX_CONFLICTS - conflicts)
         else: 
             return False
         if order == False:
             return False
         return [fixed_teams[index]] + order
     for team in teams:
-        if prev_team == None:
+        if prev_team == None and team not in fixed_teams.values():
             teams_copy = teams[:]
             teams_copy.remove(team)
             order = findOrder(index+1, teams_copy, team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS)
@@ -203,7 +205,7 @@ def findOrder(index, teams, prev_team, fixed_teams, DANCE_TEAMS, MAX_CONFLICTS):
                 continue
             else:
                 return [team] + order
-        else:
+        elif team not in fixed_teams.values():
             team1 = DANCE_TEAMS[prev_team]
             team2 = DANCE_TEAMS[team]
             conflicts = len(numConflicts(team1, team2))
